@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:tools="http://schemas.android.com/tools">
+
+<androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".SigninActivity">
@@ -20,17 +23,16 @@
 
             <TextView
                 android:id="@+id/textView3"
-                android:layout_width="88dp"
+                android:layout_width="wrap_content"
                 android:layout_height="34dp"
-                android:layout_marginStart="73dp"
-                android:layout_marginTop="30dp"
-                android:layout_marginEnd="73dp"
+                android:layout_marginStart="50dp"
+                android:layout_marginTop="35dp"
+                android:layout_marginEnd="50dp"
                 android:clickable="false"
-                android:text="Sign In"
+                android:text="Welcome Back, Teacher"
                 android:textSize="27sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.497"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -39,7 +41,7 @@
                 android:layout_width="0dp"
                 android:layout_height="48dp"
                 android:layout_marginStart="30dp"
-                android:layout_marginTop="100dp"
+                android:layout_marginTop="50dp"
                 android:layout_marginEnd="30dp"
                 android:background="@drawable/boarder"
                 android:drawableStart="@drawable/baseline_email_24"
@@ -66,7 +68,7 @@
                 android:drawablePadding="10dp"
                 android:ems="10"
                 android:hint="Password"
-                android:inputType="textPersonName"
+                android:inputType="textPassword"
                 android:password="true"
                 android:textColor="#573535"
                 android:textColorHint="#686666"
@@ -101,6 +103,7 @@
                 android:layout_marginTop="20dp"
                 android:layout_marginBottom="20dp"
                 android:onClick="toSignup"
+                android:padding="7dp"
                 android:text="Don't Have Account?  Sign Up"
                 android:textSize="18sp"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -111,17 +114,19 @@
 
             <ImageView
                 android:id="@+id/imageView9"
-                android:layout_width="300dp"
-                android:layout_height="300dp"
+                android:layout_width="350dp"
+                android:layout_height="350dp"
                 android:layout_marginStart="20dp"
-                android:layout_marginTop="70dp"
+                android:layout_marginTop="50dp"
                 android:layout_marginEnd="20dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.492"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView3"
                 app:srcCompat="@mipmap/login_min" />
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
