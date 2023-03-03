@@ -1,16 +1,10 @@
 package com.example.tms;
 
 import android.content.Intent;
-import android.media.Image;
 import android.os.Bundle;
 import android.view.View;
-import android.view.WindowManager;
-import android.widget.ImageView;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
-
-import com.bumptech.glide.Glide;
 
 public class MainActivity extends AppCompatActivity {
 

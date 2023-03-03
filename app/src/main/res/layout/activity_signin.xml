@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
-
 <androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".SigninActivity">
@@ -21,12 +20,29 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
+            <Button
+                android:id="@+id/btn_Signup2"
+                android:layout_width="0dp"
+                android:layout_height="50dp"
+                android:layout_marginStart="50dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="50dp"
+                android:backgroundTint="#0391FF"
+                android:onClick="Signin"
+                android:text="Login"
+                app:cornerRadius="10dp"
+                app:icon="@drawable/baseline_login_24"
+                app:iconGravity="textEnd"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/edPassword" />
+
             <TextView
                 android:id="@+id/textView3"
                 android:layout_width="wrap_content"
                 android:layout_height="34dp"
                 android:layout_marginStart="50dp"
-                android:layout_marginTop="35dp"
+                android:layout_marginTop="45dp"
                 android:layout_marginEnd="50dp"
                 android:clickable="false"
                 android:text="Welcome Back, Teacher"
@@ -35,6 +51,22 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/textView6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="20dp"
+                android:onClick="toSignup"
+                android:padding="7dp"
+                android:text="Don't Have Account?  Sign Up"
+                android:textSize="18sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.689"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/btn_Signup2" />
 
             <EditText
                 android:id="@+id/edEmail"
@@ -77,40 +109,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/edEmail" />
 
-            <Button
-                android:id="@+id/btn_Signup"
-                android:layout_width="0dp"
-                android:layout_height="50dp"
-                android:layout_marginStart="50dp"
-                android:layout_marginTop="35dp"
-                android:layout_marginEnd="50dp"
-                android:backgroundTint="#0391FF"
-                android:onClick="Signin"
-                android:text="Login"
-                app:cornerRadius="10dp"
-                app:icon="@drawable/baseline_login_24"
-                app:iconGravity="textEnd"
-                app:iconPadding="7dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.449"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/edPassword" />
-
-            <TextView
-                android:id="@+id/textView6"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="20dp"
-                android:onClick="toSignup"
-                android:padding="7dp"
-                android:text="Don't Have Account?  Sign Up"
-                android:textSize="18sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.71"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/btn_Signup" />
 
             <ImageView
                 android:id="@+id/imageView9"
@@ -129,4 +127,3 @@
     </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-</layout>

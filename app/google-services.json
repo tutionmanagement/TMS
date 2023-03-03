@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "11761618471",
+    "project_id": "tms-db-17e9a",
+    "storage_bucket": "tms-db-17e9a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:11761618471:android:e893f1d479a8a232284802",
+        "android_client_info": {
+          "package_name": "com.example.tms"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "11761618471-1rqks0ngqult84h52i5sdjca61jtot38.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.tms",
+            "certificate_hash": "876964ca043fd597cf80e4c697adc30bc17ad3dd"
+          }
+        },
+        {
+          "client_id": "11761618471-bo9cnr6mp1j38bv6j43jnhn2dvbg1ptu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAj7Nvb3A7Zgo_3fwy3GRbIhPzU3nhWGGY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "11761618471-bo9cnr6mp1j38bv6j43jnhn2dvbg1ptu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

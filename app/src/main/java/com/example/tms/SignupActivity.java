@@ -1,27 +1,41 @@
 package com.example.tms;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import com.example.tms.databinding.ActivitySignupBinding;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.ActionCodeSettings;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class SignupActivity extends AppCompatActivity {
 
     private String tname,name,email,password;
     private ActivitySignupBinding binging;
-    ArrayList<Integer> stdlist = new ArrayList<>();
+    List<Integer> stdlist = new ArrayList<>();
     ArrayList<Integer> sublist = new ArrayList<>();
     boolean[] selectedStd;
     boolean[] selectedSub;
@@ -29,6 +43,30 @@ public class SignupActivity extends AppCompatActivity {
     String[] subArray = {"Gujarati", "English", "Maths", "Science", "Social Science", "Hindi", "Environment","Sanskrit","Computer"};
     String finalSelectedStd = "";
     String finalSelectedSub = "";
+    private FirebaseAuth mAuth;
+    private DatabaseReference databaseReference;
+    @Override
+    public void onStart() {
+        super.onStart();
+        // Check if user is signed in (non-null) and update UI accordingly.
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if(currentUser != null){
+            currentUser.reload();
+        }
+    }
+//    ActionCodeSettings actionCodeSettings =
+//            ActionCodeSettings.newBuilder()
+//                    // URL you want to redirect back to. The domain (www.example.com) for this
+//                    // URL must be whitelisted in the Firebase Console.
+//                    .setUrl("https://tms.edunova.com")
+//                    // This must be true
+//                    .setHandleCodeInApp(true)
+//                    .setIOSBundleId("com.example.ios")
+//                    .setAndroidPackageName(
+//                            "com.example.tms",
+//                            true, /* installIfNotAvailable */
+//                            "12"    /* minimumVersion */)
+//                    .build();
     protected void onCreate(Bundle savedInstanceState) {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         super.onCreate(savedInstanceState);
@@ -37,11 +75,14 @@ public class SignupActivity extends AppCompatActivity {
         getSupportActionBar().hide();
         selectedStd = new boolean[stdArray.length];
         selectedSub = new boolean[subArray.length];
+        //Get Firebase Instance
+        mAuth = FirebaseAuth.getInstance();
+        databaseReference = FirebaseDatabase.getInstance().getReference().child("Teachers");
         // Show Preview of Std and Sub
         binging.btnPreviewSubStd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(finalSelectedStd.equals("")||finalSelectedSub.equals("")){
+                if(finalSelectedStd.isEmpty()||finalSelectedSub.isEmpty()){
                     Toast.makeText(SignupActivity.this, "Please Select Subjects And Standard", Toast.LENGTH_SHORT).show();
                 }
                 else {
@@ -103,7 +144,6 @@ public class SignupActivity extends AppCompatActivity {
                         // set text on textView
                         binging.sStd.setText(stringBuilder.toString());
                         finalSelectedStd = stringBuilder.toString();
-//                        Toast.makeText(SignupActivity.this, finalSelectedStd, Toast.LENGTH_SHORT).show();
                     }
                 });
                 builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -126,6 +166,7 @@ public class SignupActivity extends AppCompatActivity {
                             binging.sStd.setText("");
                             finalSelectedStd = "";
                         }
+
                     }
                 });
                 // show dialog
@@ -170,6 +211,7 @@ public class SignupActivity extends AppCompatActivity {
                         for (int j = 0; j < sublist.size(); j++) {
                             // concat array value
                             stringBuilder.append(subArray[sublist.get(j)]);
+
                             // check condition
                             if (j != sublist.size() - 1) {
                                 // When j value  not equal
@@ -178,10 +220,8 @@ public class SignupActivity extends AppCompatActivity {
                                 stringBuilder.append(", ");
                             }
                         }
-                        // set text on textView
                         binging.sSub.setText(stringBuilder.toString());
                         finalSelectedSub = stringBuilder.toString();
-//                        Toast.makeText(SignupActivity.this, finalSelectedSub, Toast.LENGTH_SHORT).show();
                     }
                 });
 
@@ -214,15 +254,15 @@ public class SignupActivity extends AppCompatActivity {
     }
     public void toSignin(View v){
         Intent intent = new Intent(SignupActivity.this, SigninActivity.class);
-        startActivity(intent);
+//        startActivity(intent);
         finish();
     }
 
     public void Signup(View v){
-        tname = binging.edName.getText().toString();
-        name = binging.edName.getText().toString();
-        email = binging.edEmail.getText().toString();
-        password = binging.edPassword.getText().toString();
+        tname = binging.edClassesName.getText().toString().trim();
+        name = binging.edName.getText().toString().trim();
+        email = binging.edEmail.getText().toString().trim();
+        password = binging.edPassword.getText().toString().trim();
         if(email.equals("") || password.equals("")||name.equals("") || tname.equals("") || finalSelectedSub.equals("")|| finalSelectedStd.equals("")){
             binging.edEmail.setError("This Field Required");
             binging.edPassword.setError("This Field Required");
@@ -230,8 +270,50 @@ public class SignupActivity extends AppCompatActivity {
             binging.edClassesName.setError("This Field Required");
             Toast.makeText(this, "Please Select Subject And Standard", Toast.LENGTH_SHORT).show();
         }else{
-            Intent intent = new Intent(SignupActivity.this, DashboardActivity.class);
-            startActivity(intent);
+                if(password.length() >= 6) {
+                    String[] finalstds = finalSelectedStd.split(", ");
+                    ArrayList<String> stdlist = new ArrayList<String>(Arrays.asList(finalstds));
+                    String[] finalsubs = finalSelectedSub.split(", ");
+                    ArrayList<String> sublist = new ArrayList<String>(Arrays.asList(finalsubs));
+                    TeacherModel tm = new TeacherModel( tname,name,stdlist,sublist,email);
+                    String ukey = databaseReference.push().getKey();
+                    databaseReference.child(ukey).setValue(tm);
+//                    Log.i("Std",""+stdlist);
+//                    Log.i("Subjects",""+sublist);
+//                    FirebaseAuth auth = FirebaseAuth.getInstance();
+//                    auth.sendSignInLinkToEmail(email, actionCodeSettings)
+//                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+//                                @Override
+//                                public void onComplete(@NonNull Task<Void> task) {
+//                                    if (task.isSuccessful()) {
+//                                        Log.d("TAG", "Email sent.");
+//                                    }
+//                            });
+                    mAuth.createUserWithEmailAndPassword(email, password)
+                            .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                    if (task.isSuccessful()) {
+                                        SharedPreferences sharedPreferences = getSharedPreferences("SystemPre",MODE_PRIVATE);
+                                        SharedPreferences.Editor editor=sharedPreferences.edit();
+                                        editor.putBoolean("isLogin",true);
+                                        editor.putString("email",email);
+                                        editor.commit();
+                                        // Sign in success, update UI with the signed-in user's information
+                                        Intent intent = new Intent(SignupActivity.this, DashboardActivity.class);
+                                        startActivity(intent);
+                                        finish();
+                                    } else {
+                                        // If sign in fails, display a message to the user.
+                                        Toast.makeText(SignupActivity.this, "Authentication failed.",
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                }else{
+                    Toast.makeText(SignupActivity.this, "Password least 6 character long", Toast.LENGTH_SHORT).show();
+                }
+
         }
     }
 
