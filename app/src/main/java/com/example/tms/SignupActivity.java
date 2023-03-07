@@ -6,18 +6,23 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.tms.databinding.ActivitySignupBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.ActionCodeSettings;
+
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -28,13 +33,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class SignupActivity extends AppCompatActivity {
 
-    private String tname,name,email,password;
+    private String tname,name,email,password,phone;
     private ActivitySignupBinding binging;
+    private EditText txtEmail;
+    private Button btnEditEmail;
     List<Integer> stdlist = new ArrayList<>();
     ArrayList<Integer> sublist = new ArrayList<>();
     boolean[] selectedStd;
@@ -54,19 +64,6 @@ public class SignupActivity extends AppCompatActivity {
             currentUser.reload();
         }
     }
-//    ActionCodeSettings actionCodeSettings =
-//            ActionCodeSettings.newBuilder()
-//                    // URL you want to redirect back to. The domain (www.example.com) for this
-//                    // URL must be whitelisted in the Firebase Console.
-//                    .setUrl("https://tms.edunova.com")
-//                    // This must be true
-//                    .setHandleCodeInApp(true)
-//                    .setIOSBundleId("com.example.ios")
-//                    .setAndroidPackageName(
-//                            "com.example.tms",
-//                            true, /* installIfNotAvailable */
-//                            "12"    /* minimumVersion */)
-//                    .build();
     protected void onCreate(Bundle savedInstanceState) {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         super.onCreate(savedInstanceState);
@@ -263,54 +260,100 @@ public class SignupActivity extends AppCompatActivity {
         name = binging.edName.getText().toString().trim();
         email = binging.edEmail.getText().toString().trim();
         password = binging.edPassword.getText().toString().trim();
-        if(email.equals("") || password.equals("")||name.equals("") || tname.equals("") || finalSelectedSub.equals("")|| finalSelectedStd.equals("")){
+        phone = binging.edPhone.getText().toString().trim();
+        if(email.equals("") || password.equals("")||name.equals("") || tname.equals("") || finalSelectedSub.equals("")|| finalSelectedStd.equals("")||phone.equals("")){
             binging.edEmail.setError("This Field Required");
             binging.edPassword.setError("This Field Required");
             binging.edName.setError("This Field Required");
             binging.edClassesName.setError("This Field Required");
+            binging.edPhone.setError("This Field is Required");
             Toast.makeText(this, "Please Select Subject And Standard", Toast.LENGTH_SHORT).show();
         }else{
                 if(password.length() >= 6) {
-                    String[] finalstds = finalSelectedStd.split(", ");
-                    ArrayList<String> stdlist = new ArrayList<String>(Arrays.asList(finalstds));
-                    String[] finalsubs = finalSelectedSub.split(", ");
-                    ArrayList<String> sublist = new ArrayList<String>(Arrays.asList(finalsubs));
-                    TeacherModel tm = new TeacherModel( tname,name,stdlist,sublist,email);
-                    String ukey = databaseReference.push().getKey();
-                    databaseReference.child(ukey).setValue(tm);
-//                    Log.i("Std",""+stdlist);
-//                    Log.i("Subjects",""+sublist);
-//                    FirebaseAuth auth = FirebaseAuth.getInstance();
-//                    auth.sendSignInLinkToEmail(email, actionCodeSettings)
-//                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-//                                @Override
-//                                public void onComplete(@NonNull Task<Void> task) {
-//                                    if (task.isSuccessful()) {
-//                                        Log.d("TAG", "Email sent.");
-//                                    }
-//                            });
-                    mAuth.createUserWithEmailAndPassword(email, password)
-                            .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                                @Override
-                                public void onComplete(@NonNull Task<AuthResult> task) {
-                                    if (task.isSuccessful()) {
-                                        SharedPreferences sharedPreferences = getSharedPreferences("SystemPre",MODE_PRIVATE);
-                                        SharedPreferences.Editor editor=sharedPreferences.edit();
-                                        editor.putBoolean("isLogin",true);
-                                        editor.putString("email",email);
-                                        editor.commit();
-                                        // Sign in success, update UI with the signed-in user's information
-                                        Intent intent = new Intent(SignupActivity.this, DashboardActivity.class);
-                                        startActivity(intent);
-                                        finish();
-                                    } else {
-                                        // If sign in fails, display a message to the user.
-                                        Toast.makeText(SignupActivity.this, "Authentication failed.",
-                                                Toast.LENGTH_SHORT).show();
+                    if (phone.length() == 10) {
+                        String[] finalstds = finalSelectedStd.split(", ");
+                        ArrayList<String> stdlist = new ArrayList<String>(Arrays.asList(finalstds));
+                        String[] finalsubs = finalSelectedSub.split(", ");
+                        ArrayList<String> sublist = new ArrayList<String>(Arrays.asList(finalsubs));
+                        TeacherModel tm = new TeacherModel(tname, name, stdlist, sublist, email, phone);
+                        mAuth.createUserWithEmailAndPassword(email, password)
+                                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<AuthResult> task) {
+                                        LayoutInflater inflater = LayoutInflater.from(getApplicationContext());
+                                        View view = inflater.inflate(R.layout.alert_dialog, null);
+                                        AlertDialog builder = new AlertDialog.Builder(SignupActivity.this).create();
+                                        builder.setCancelable(false);
+                                        builder.setView(view);
+                                        builder.setTitle("Email Verification");
+                                        builder.setMessage("A Email has been send on below email \nYou will be redirected to Dashboard in few moments...\nNot You? Type New Email to Resend\n");
+                                        txtEmail = view.findViewById(R.id.edemailforalert);
+                                        btnEditEmail = view.findViewById(R.id.btneditemail);
+                                        txtEmail.setEnabled(false);
+                                        txtEmail.setText(email);
+                                        btnEditEmail.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View view) {
+                                                binging.edEmail.requestFocus();
+                                                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                                                imm.showSoftInput(binging.edEmail, InputMethodManager.SHOW_IMPLICIT);
+                                                builder.dismiss();
+                                            }
+                                        });
+                                        builder.setButton(Dialog.BUTTON_POSITIVE, "Done", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialogInterface, int i) {
+                                                builder.dismiss();
+                                            }
+                                        });
+                                        builder.show();
+
+                                        if (task.isSuccessful()) {
+                                            mAuth.getCurrentUser().sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    if (task.isSuccessful()) {
+                                                        Timer timer = new Timer();
+                                                        timer.schedule(new TimerTask() {
+                                                            @Override
+                                                            public void run() {
+                                                                mAuth.getCurrentUser().reload();
+                                                                if (mAuth.getCurrentUser().isEmailVerified()) {
+                                                                    timer.cancel();
+                                                                    builder.dismiss();
+                                                                    String ukey = databaseReference.push().getKey();
+                                                                    databaseReference.child(ukey).setValue(tm);
+                                                                    SharedPreferences sharedPreferences = getSharedPreferences("SystemPre", MODE_PRIVATE);
+                                                                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                                                                    editor.putBoolean("isLogin", true);
+                                                                    editor.putString("email", email);
+                                                                    editor.commit();
+                                                                    Log.i("Email Verify", "True");
+                                                                    // Sign in success, update UI with the signed-in user's information
+                                                                    Intent intent = new Intent(SignupActivity.this, DashboardActivity.class);
+                                                                    startActivity(intent);
+                                                                    finish();
+                                                                } else {
+                                                                    Log.i("Email Verify", "False");
+                                                                }
+                                                            }
+                                                        }, 0, 800);
+                                                    } else {
+                                                        Toast.makeText(SignupActivity.this, "Please Verify Your Email (" + email + ")", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                }
+                                            });
+
+                                        } else {
+                                            // If sign in fails, display a message to the user.
+                                            Toast.makeText(SignupActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+                                        }
                                     }
-                                }
-                            });
-                }else{
+                                });
+                    } else {
+                        Toast.makeText(SignupActivity.this, "Phone Number least 10 character long", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
                     Toast.makeText(SignupActivity.this, "Password least 6 character long", Toast.LENGTH_SHORT).show();
                 }
 

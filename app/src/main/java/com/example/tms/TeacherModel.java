@@ -3,18 +3,21 @@ package com.example.tms;
 import java.util.ArrayList;
 
 public class TeacherModel {
-    private String tcName;
+    protected String tcName;
     private String fullName;
     private ArrayList<String> standards;
     private ArrayList<String> subjects;
     private String email;
+    private String phone;
+    public TeacherModel(){};
 
-    public TeacherModel(String tcName, String fullName, ArrayList<String> standards, ArrayList<String> subjects, String email) {
+    public TeacherModel(String tcName, String fullName, ArrayList<String> standards, ArrayList<String> subjects, String email, String phone) {
         this.tcName = tcName;
         this.fullName = fullName;
         this.standards = standards;
         this.subjects = subjects;
         this.email = email;
+        this.phone = phone;
     }
 
     public String getTcName() {
@@ -36,12 +39,17 @@ public class TeacherModel {
     public ArrayList<String> getStandards() {
         return standards;
     }
+
     public void setStandards(ArrayList<String> standards) {
         this.standards = standards;
     }
 
     public ArrayList<String> getSubjects() {
         return subjects;
+    }
+
+    public void setSubjects(ArrayList<String> subjects) {
+        this.subjects = subjects;
     }
 
     public String getEmail() {
@@ -52,7 +60,11 @@ public class TeacherModel {
         this.email = email;
     }
 
-    public void setSubjects(ArrayList<String> subjects) {
-        this.subjects = subjects;
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 }
